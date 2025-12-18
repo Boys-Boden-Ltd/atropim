@@ -82,9 +82,30 @@ services:
       init:
         condition: service_completed_successfully
     command: >
-      /bin/bash -c "printenv > /etc/environment 
-      && echo '* * * * * /usr/local/bin/php /var/www/html/console.php cron' >> /etc/crontab
-      && cron -f"
+      /bin/bash -c "
+      echo '>> Setting up PHP Interceptor...' &&
+      if [ ! -f /usr/local/bin/php-original ]; then
+          mv /usr/local/bin/php /usr/local/bin/php-original
+      fi &&
+      echo '#!/bin/bash' > /usr/local/bin/php &&
+      echo 'if [[ \"$$@\" == *\"daemon\"* ]]; then' >> /usr/local/bin/php &&
+      echo '    # Detach daemon process from the cron session using setsid' >> /usr/local/bin/php &&
+      echo '    exec setsid /usr/local/bin/php-original \"$$@\"' >> /usr/local/bin/php &&
+      echo 'else' >> /usr/local/bin/php &&
+      echo '    # Run normal commands (like cron itself) directly' >> /usr/local/bin/php &&
+      echo '    exec /usr/local/bin/php-original \"$$@\"' >> /usr/local/bin/php &&
+      echo 'fi' >> /usr/local/bin/php &&
+      chmod +x /usr/local/bin/php &&
+      echo '>> Fixing permissions...' &&
+      chown -R www-data:www-data /var/www/html/data /var/www/html/public /var/www/html/upload &&
+      echo '>> Configuring Crontab...' &&
+      echo '#!/bin/bash' > /root/run_cron.sh &&
+      echo 'cd /var/www/html' >> /root/run_cron.sh &&
+      echo '/usr/local/bin/php console.php cron > /dev/null 2>&1' >> /root/run_cron.sh &&
+      chmod +x /root/run_cron.sh &&
+      echo '* * * * * root /root/run_cron.sh' >> /etc/crontab &&
+      echo '>> Starting Cron Daemon...' &&
+      cron -f"
 
 volumes:
   db_data:
