@@ -1,2 +1,2 @@
-* * * * * www-data /usr/local/bin/php /var/www/html/console.php cron > /proc/1/fd/1 2>&1
+* * * * * www-data /usr/local/bin/php /var/www/html/console.php cron > /dev/stdout
 

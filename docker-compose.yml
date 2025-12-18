@@ -58,17 +58,16 @@ services:
       DB_PORT: 5432
     volumes:
       - ./html:/var/www/html
-      - ./config/crontab:/tmp/crontab-source
+      #- ./config/crontab:/tmp/crontab-source
     depends_on:
       - db
       - app
     command: >
-      /bin/sh -c "
-      cp /tmp/crontab-source /etc/cron.d/atropim &&
-      chown root:root /etc/cron.d/atropim &&
-      chmod 0644 /etc/cron.d/atropim &&
-      printenv > /etc/environment &&
-      cron -f"
+      /bin/bash -c "printenv > /etc/environment 
+      && echo '* * * * * www-data /usr/local/bin/php /var/www/html/console.php cron > /proc/1/fd/1 2>&1' >> /etc/crontab
+      && echo '* * * * * www-data echo 'hello' > /proc/1/fd/1 2>&1' >> /etc/crontab
+      && echo '' >> /etc/crontab
+      && cron -f"
 
 volumes:
   db_data:
