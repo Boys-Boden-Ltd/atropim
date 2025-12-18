@@ -14,6 +14,7 @@ services:
     command: postgres -c shared_buffers=${DB_MEMORY_LIMIT} -c work_mem=16MB
 
   app:
+    #user: www-data
     build:
       context: .
       dockerfile: Dockerfile
@@ -64,9 +65,7 @@ services:
       - app
     command: >
       /bin/bash -c "printenv > /etc/environment 
-      && echo '* * * * * www-data /usr/local/bin/php /var/www/html/console.php cron > /proc/1/fd/1 2>&1' >> /etc/crontab
-      && echo '* * * * * www-data echo 'hello' > /proc/1/fd/1 2>&1' >> /etc/crontab
-      && echo '' >> /etc/crontab
+      && echo '* * * * * www-data /usr/local/bin/php /var/www/html/console.php cron' >> /etc/crontab
       && cron -f"
 
 volumes:
