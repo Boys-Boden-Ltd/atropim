@@ -1,6 +1,7 @@
 FROM php:8.3-fpm
 
-RUN apt update && apt install -y \
+RUN apt-get update && apt-get install -y \
+    cron \
     git \
     procps \
     postgresql-client \
@@ -23,7 +24,9 @@ RUN apt update && apt install -y \
     libmagickwand-dev \
     libldap2-dev \
     libldap-common \
-    $PHPIZE_DEPS
+    $PHPIZE_DEPS \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
