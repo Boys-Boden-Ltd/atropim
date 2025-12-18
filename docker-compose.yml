@@ -74,6 +74,7 @@ services:
       DB_PORT: 5432
     volumes:
       - ./html:/var/www/html
+      - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
       #- ./config/crontab:/tmp/crontab-source
     depends_on:
       db:
@@ -82,7 +83,7 @@ services:
         condition: service_completed_successfully
     command: >
       /bin/bash -c "printenv > /etc/environment 
-      && echo '* * * * * www-data /usr/local/bin/php /var/www/html/console.php cron' >> /etc/crontab
+      && echo '* * * * * /usr/local/bin/php /var/www/html/console.php cron' >> /etc/crontab
       && cron -f"
 
 volumes:
