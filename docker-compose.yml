@@ -66,11 +66,17 @@ services:
       DB_PORT: 5432
     volumes:
       - ./html:/var/www/html
-      - ./config/crontab:/etc/cron.d/atropim
+      - ./config/crontab:/tmp/crontab-source
     depends_on:
       - db
       - app
-    command: /bin/sh -c "printenv > /etc/environment && chmod 0644 /etc/cron.d/atropim && cron -f"
+    command: >
+      /bin/sh -c "
+      cp /tmp/crontab-source /etc/cron.d/atropim &&
+      chown root:root /etc/cron.d/atropim &&
+      chmod 0644 /etc/cron.d/atropim &&
+      printenv > /etc/environment &&
+      cron -f"
 
 volumes:
   db_data:

@@ -3,3 +3,4 @@ auth.json
 .env.staging
 .env.prod
 html/
+*.swp

@@ -4,6 +4,7 @@ FROM php:8.3-fpm
 RUN apt-get update && apt-get install -y \
     git \
     cron \
+    procps \
     postgresql-client \
     zip \
     unzip \
@@ -12,9 +13,9 @@ RUN apt-get update && apt-get install -y \
     libcurl4 \
     libcurl4-openssl-dev \
     libsodium-dev \
-		libfreetype-dev \
-		libjpeg62-turbo-dev \
-		libpng-dev \
+	libfreetype-dev \
+	libjpeg62-turbo-dev \
+	libpng-dev \
     libpq-dev \
     libavif-dev \
     libattr1-dev \
