@@ -3,6 +3,10 @@ services:
     environment:
       APP_ENV: dev
       PHP_MEMORY_LIMIT: 2048M
+
+  db:
+    ports:
+      - 5432:5432
     
   web:
     ports:
