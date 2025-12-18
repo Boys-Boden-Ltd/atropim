@@ -1,17 +1,26 @@
 version: "3.4"
 
 services:
-  init:
-    user: www-data
+  base:
+    image: atropim-base:latest
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/base.Dockerfile
+    deploy:
+      mode: replicated
+      replicas: 0
+
+  init:
+    user: www-data
+    image: atropim-base:latest
     volumes:
       - ./html:/var/www/html
       - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
+    entrypoint: ["docker-entrypoint.sh"]
     command: ["true"]
     depends_on:
       - db
+      - base
 
   db:
     image: postgres:16-alpine
@@ -29,7 +38,7 @@ services:
     user: www-data
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/app.Dockerfile
     container_name: ${PROJECT_NAME}-app
     restart: always
     environment:
@@ -49,6 +58,8 @@ services:
         condition: service_started
       init:
         condition: service_completed_successfully
+      base:
+        condition: service_completed_successfully
 
   web:
     image: nginx:mainline-alpine
@@ -63,7 +74,7 @@ services:
   cron:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/cron.Dockerfile
     container_name: ${PROJECT_NAME}-cron
     restart: always
     environment:
@@ -75,37 +86,14 @@ services:
     volumes:
       - ./html:/var/www/html
       - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
-      #- ./config/crontab:/tmp/crontab-source
+      - ./config/cron/crontab:/etc/cron.d/atro-cron
     depends_on:
       db:
         condition: service_started
       init:
         condition: service_completed_successfully
-    command: >
-      /bin/bash -c "
-      echo '>> Setting up PHP Interceptor...' &&
-      if [ ! -f /usr/local/bin/php-original ]; then
-          mv /usr/local/bin/php /usr/local/bin/php-original
-      fi &&
-      echo '#!/bin/bash' > /usr/local/bin/php &&
-      echo 'if [[ \"$$@\" == *\"daemon\"* ]]; then' >> /usr/local/bin/php &&
-      echo '    # Detach daemon process from the cron session using setsid' >> /usr/local/bin/php &&
-      echo '    exec setsid /usr/local/bin/php-original \"$$@\"' >> /usr/local/bin/php &&
-      echo 'else' >> /usr/local/bin/php &&
-      echo '    # Run normal commands (like cron itself) directly' >> /usr/local/bin/php &&
-      echo '    exec /usr/local/bin/php-original \"$$@\"' >> /usr/local/bin/php &&
-      echo 'fi' >> /usr/local/bin/php &&
-      chmod +x /usr/local/bin/php &&
-      echo '>> Fixing permissions...' &&
-      chown -R www-data:www-data /var/www/html/data /var/www/html/public /var/www/html/upload &&
-      echo '>> Configuring Crontab...' &&
-      echo '#!/bin/bash' > /root/run_cron.sh &&
-      echo 'cd /var/www/html' >> /root/run_cron.sh &&
-      echo '/usr/local/bin/php console.php cron > /dev/null 2>&1' >> /root/run_cron.sh &&
-      chmod +x /root/run_cron.sh &&
-      echo '* * * * * root /root/run_cron.sh' >> /etc/crontab &&
-      echo '>> Starting Cron Daemon...' &&
-      cron -f"
+      base:
+        condition: service_completed_successfully
 
 volumes:
   db_data:
