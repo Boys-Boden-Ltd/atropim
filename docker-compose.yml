@@ -1,6 +1,18 @@
 version: "3.4"
 
 services:
+  init:
+    user: www-data
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./html:/var/www/html
+      - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
+    command: ["true"]
+    depends_on:
+      - db
+
   db:
     image: postgres:16-alpine
     container_name: ${PROJECT_NAME}-db
@@ -33,7 +45,10 @@ services:
       - ./html:/var/www/html
       - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
     depends_on:
-      - db
+      db:
+        condition: service_started
+      init:
+        condition: service_completed_successfully
 
   web:
     image: nginx:mainline-alpine
@@ -61,8 +76,10 @@ services:
       - ./html:/var/www/html
       #- ./config/crontab:/tmp/crontab-source
     depends_on:
-      - db
-      - app
+      db:
+        condition: service_started
+      init:
+        condition: service_completed_successfully
     command: >
       /bin/bash -c "printenv > /etc/environment 
       && echo '* * * * * www-data /usr/local/bin/php /var/www/html/console.php cron' >> /etc/crontab
