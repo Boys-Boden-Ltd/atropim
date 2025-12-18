@@ -14,7 +14,7 @@ services:
     command: postgres -c shared_buffers=${DB_MEMORY_LIMIT} -c work_mem=16MB
 
   app:
-    #user: www-data
+    user: www-data
     build:
       context: .
       dockerfile: Dockerfile

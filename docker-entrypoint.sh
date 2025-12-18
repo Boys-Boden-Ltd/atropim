@@ -21,9 +21,9 @@ if [ ! -f "vendor/autoload.php" ]; then
     echo ">> Running Installation..."
     echo "----------------------------------------------------------------"
 
-    php composer.phar self-update && php composer.phar update
+    php composer.phar update
 
-    chown -R www-data:www-data .
+    chown -R 33:33 .
     chmod -R 775 data public upload vendor
 
     echo ">> INSTALLATION COMPLETE"
