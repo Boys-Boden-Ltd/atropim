@@ -1,0 +1,5 @@
+auth.json
+.env.dev
+.env.staging
+.env.prod
+html/

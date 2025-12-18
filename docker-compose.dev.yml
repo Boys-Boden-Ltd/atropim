@@ -1,0 +1,10 @@
+version: "3.4"
+services:
+  app:
+    environment:
+      APP_ENV: dev
+      PHP_MEMORY_LIMIT: 1024M
+    
+  web:
+    ports:
+      - "8080:80" # Access via localhost:8080
