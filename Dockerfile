@@ -1,6 +1,5 @@
 FROM php:8.3-fpm
 
-# 1. Install System Libraries (Now including ImageMagick dev libs)
 RUN apt-get update && apt-get install -y \
     git \
     cron \
@@ -27,7 +26,6 @@ RUN apt-get update && apt-get install -y \
     libldap-common \
     $PHPIZE_DEPS
 
-# 2. Configure & Install Core PHP Extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         mbstring \
@@ -43,12 +41,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         opcache \
         exif
 
-# 3. Install ImageMagick via PECL (Critical for PIM)
 RUN pecl install xattr imagick \
     && docker-php-ext-enable xattr imagick
-
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 

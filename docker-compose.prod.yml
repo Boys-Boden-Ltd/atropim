@@ -2,7 +2,7 @@ version: "3.4"
 services:
   db:
     container_name: ${PROJECT_NAME}-db
-    command: postgres -c shared_buffers=512MB # Tune for performance
+    command: postgres -c shared_buffers=512MB
 
   app:
     container_name: ${PROJECT_NAME}-app
@@ -12,11 +12,10 @@ services:
   web:
     container_name: ${PROJECT_NAME}-web
     environment:
-      # These env vars are read by the Nginx Proxy Manager (or Traefik)
       VIRTUAL_HOST: ${DOMAIN}
       LETSENCRYPT_HOST: ${DOMAIN}
     expose:
-      - 80 # Only expose 80 internally to the proxy
+      - 80
     networks:
       - default
       - proxy_network
