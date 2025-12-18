@@ -11,7 +11,9 @@ if [ ! -f "vendor/autoload.php" ]; then
 
     echo ">> Running Installation..."
 
-    php composer.phar self-update && php composer.phar update
+    php composer.phar self-update
+    export COMPOSER_PROCESS_TIMEOUT=2000
+    php composer.phar update -n
 
     echo ">> INSTALLATION COMPLETE"
 else

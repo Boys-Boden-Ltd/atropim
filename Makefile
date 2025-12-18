@@ -53,7 +53,7 @@ dev-clean:
 	$(CMD_DEV) down -v --remove-orphans
 	@echo ">> Removing html directory..."
 	@# We use a docker container to remove the files to avoid permission issues on Linux
-	@docker run --rm -v $(PWD):/mnt alpine sh -c "rm -rf /mnt/html/* /mnt/html/.* 2>/dev/null || true"
+	@docker run --rm -v $(PWD):/mnt alpine sh -c "rm -rf /mnt/html 2>/dev/null || true"
 	@echo ">> Environment Reset Complete."
 
 staging:

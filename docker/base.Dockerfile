@@ -1,4 +1,4 @@
-FROM php:8.3-fpm
+FROM php:8.4-fpm
 
 RUN apt-get update && apt-get install -y \
     cron \
@@ -45,6 +45,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 
 RUN pecl install xattr imagick \
     && docker-php-ext-enable xattr imagick
+
+RUN mkdir -p /var/www/.cache && chown -R www-data:www-data /var/www/.cache
 
 WORKDIR /var/www/html
 
