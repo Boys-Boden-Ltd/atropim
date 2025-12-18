@@ -86,7 +86,7 @@ services:
     volumes:
       - ./html:/var/www/html
       - ./config/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
-      - ./config/cron/crontab:/etc/cron.d/atro-cron
+      - ./config/crontab:/etc/cron.d/atrocron
     depends_on:
       db:
         condition: service_started
