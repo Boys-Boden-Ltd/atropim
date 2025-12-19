@@ -22,6 +22,10 @@ if [ ! -f "vendor/autoload.php" ]; then
     php composer.phar config repositories.boysandbodencli vcs https://github.com/Boys-Boden-Ltd/atrocore-cli-install
     php composer.phar require atrocore/cli-install dev-main
 
+    sed -i "s/'isInstalled' => false/'isInstalled' => true/" data/config.php
+
+    php console.php install
+
     echo ">> Application Installation Complete"
 
 else
